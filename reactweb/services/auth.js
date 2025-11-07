@@ -78,7 +78,7 @@ function getRefreshToken() {
       }
     }
   }
-    return null;
+  return null;
 }
 
 function updateToken(token) {
@@ -159,19 +159,32 @@ export const authService = {
 
   async registerJogadora(fullName, email, password, position, team) {
     try {
-      if (process.env.NODE_ENV === 'development') {
+      // Durante o desenvolvimento, simular registro bem-sucedido
+      if (process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_API_URL) {
         return { success: true, message: 'Registro simulado com sucesso!' };
       }
-      const response = await api.post('/register-jogadora', {
-        fullName,
+
+      // Preparar os dados no formato que o backend espera
+      const userData = {
+        username: fullName,
         email,
         password,
+        role: 'Player',
         position,
-        team
-      });
-      return response.data;
+        height: '170',
+        age: '25',
+      };
+
+      const response = await axios.post(`http://localhost:3001/register`, userData);
+      console.log(response.data);
+      
+      return { success: true, message: response.data.message || 'Registro realizado com sucesso!' };
     } catch (error) {
-      throw error;
+      console.error('Erro no registro de jogadora:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message || 'Erro ao registrar jogadora'
+      };
     }
   },
 
@@ -208,7 +221,7 @@ export const authService = {
       position: 'Atacante',
       team: 'Corinthians',
       token: 'mock-token-jogadora-123456',
-};
+    };
     this.setUserData(mockUser);
     return mockUser;
   },
