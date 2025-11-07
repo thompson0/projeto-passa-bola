@@ -1,26 +1,160 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/assets/fonts/Inter/Inter-Regular.woff2') format('woff2'),
+       url('/assets/fonts/Inter/Inter-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/assets/fonts/Inter/Inter-Medium.woff2') format('woff2'),
+       url('/assets/fonts/Inter/Inter-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/assets/fonts/Inter/Inter-Bold.woff2') format('woff2'),
+       url('/assets/fonts/Inter/Inter-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary: #6E2BB9;
+  --color-primary-dark: #2B0A4A;
+  --color-primary-light: #8A4FD0;
+  --color-secondary: #4A158A;
+  --color-lilac: #D8B4FE;
+  --color-pink: #EC4899;
+  --color-green: #10B981;
+  --color-red: #EF4444;
+  --color-surface: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-text: #111827;
+  --color-text-secondary: #6B7280;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Reset leve */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
+  width: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Backgrounds utilitários */
+.bg-hero-gradient {
+  background: linear-gradient(180deg, rgba(43,10,74,0.75) 0%, rgba(90,30,138,0.6) 100%);
+}
+
+.bg-app {
+  background-color: var(--color-primary-dark);
+}
+
+.overlay-radial {
+  background: radial-gradient(circle at center, rgba(43,10,74,0.5) 0%, rgba(43,10,74,0.9) 100%);
+}
+
+.overlay-linear {
+  background: linear-gradient(to bottom, rgba(43,10,74,0.7) 0%, rgba(43,10,74,0.95) 100%);
+}
+
+/* Esconder scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Classes utilitárias */
+@layer components {
+  /* Botões */
+  .btn {
+    @apply inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none;
+  }
+  
+  .btn-primary {
+    @apply btn bg-pink-500 hover:bg-pink-600 text-white rounded-[12px] h-[48px] px-6 shadow-soft focus:ring-2 focus:ring-lilac/30;
+  }
+  
+  .btn-outline {
+    @apply btn border-2 border-lilac text-primary hover:bg-lilac/10 rounded-[12px] h-[48px] px-6 focus:ring-2 focus:ring-lilac/30;
+  }
+  
+  .btn-ghost {
+    @apply btn text-primary hover:bg-lilac/10 rounded-[12px] h-[48px] px-6 focus:ring-2 focus:ring-lilac/30;
+  }
+
+  .btn-icon {
+    @apply btn w-10 h-10 rounded-full flex items-center justify-center bg-lilac/10 text-primary hover:bg-lilac/20 focus:ring-2 focus:ring-lilac/30;
+  }
+  
+  /* Inputs */
+  .input-base {
+    @apply bg-white border border-border rounded-[12px] h-[48px] px-4 w-full focus:border-lilac focus:ring-2 focus:ring-lilac/30 focus:outline-none transition-all duration-200;
+  }
+  
+  /* Cards */
+  .card-base {
+    @apply bg-white rounded-[12px] shadow-soft p-4;
+  }
+
+  /* Pills */
+  .pill {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .pill-primary {
+    @apply pill bg-primary/10 text-primary;
+  }
+
+  .pill-success {
+    @apply pill bg-green/10 text-green;
+  }
+
+  .pill-warning {
+    @apply pill bg-yellow-500/10 text-yellow-600;
+  }
+
+  .pill-danger {
+    @apply pill bg-red/10 text-red;
+  }
+
+  .pill-info {
+    @apply pill bg-blue-500/10 text-blue-600;
+  }
+
+  /* Tipografia */
+  .font-display {
+    @apply font-sans font-bold;
+  }
+
+  .font-ui {
+    @apply font-sans;
+  }
 }
