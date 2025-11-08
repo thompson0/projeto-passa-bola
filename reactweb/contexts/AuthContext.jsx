@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { API_URL } from '@/services/apiConfig';
+import { setCookie, removeCookie } from '@/utils/cookies';
 
 // Criação do contexto
 const AuthContext = createContext({
@@ -62,10 +63,9 @@ export const AuthProvider = ({ children }) => {
     const responseInterceptor = axios.interceptors.response.use(
       (response) => response,
       (error) => {
-        if (error.response?.status === 401) {
-          // Token expirado ou inválido
+        if (error.response?.status === 401 && !window.location.pathname.includes('/login')) {
+          // Token expirado ou inválido e não estamos na página de login
           logout();
-          router.push('/login');
         }
         return Promise.reject(error);
       }
@@ -94,9 +94,18 @@ export const AuthProvider = ({ children }) => {
           role: loginRole
         };
         
+        // Armazenar dados do usuário
         localStorage.setItem('user', JSON.stringify(userData));
+        setCookie('token', userData.token);
         setUser(userData);
         setRole(loginRole);
+        
+        // Obter o parâmetro de redirecionamento da URL
+        const params = new URLSearchParams(window.location.search);
+        const redirectTo = params.get('from') || '/inicio-jogadora';
+        
+        // Redirecionar para a página apropriada
+        router.push(redirectTo);
         
         return userData;
       }
@@ -111,6 +120,7 @@ export const AuthProvider = ({ children }) => {
   // Função de logout
   const logout = () => {
     localStorage.removeItem('user');
+    removeCookie('token');
     setUser(null);
     setRole(null);
     router.push('/login');
