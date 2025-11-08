@@ -56,15 +56,10 @@ export default function LoginTorcedoraPage() {
           ...result,
           role: 'torcedora'
         }));
-        localStorage.setItem('user', JSON.stringify({
-          ...result,
-          role: 'torcedora'
-        }));
-        
         setDebugInfo('Login bem-sucedido! Redirecionando...');
         
         // Forçar o redirecionamento usando window.location
-        window.location.href = '/inicio';
+        router.push('/inicio');
         return; // Importante para evitar que o código continue executando
       } else {
         setError(result.message || 'Falha ao fazer login. Verifique suas credenciais.');

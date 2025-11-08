@@ -100,7 +100,6 @@ export default function LoginJogadoraPage() {
                 };
                 
                 localStorage.setItem('auth', JSON.stringify(authData));
-                localStorage.setItem('user', JSON.stringify(authData));
               } else {
                 console.log('Não foi possível obter dados do usuário, usando dados básicos');
                 
@@ -116,7 +115,6 @@ export default function LoginJogadoraPage() {
                 };
                 
                 localStorage.setItem('auth', JSON.stringify(basicAuthData));
-                localStorage.setItem('user', JSON.stringify(basicAuthData));
               }
             } catch (fetchError) {
               console.error('Erro ao buscar dados do usuário:', fetchError);
@@ -134,7 +132,6 @@ export default function LoginJogadoraPage() {
               };
               
               localStorage.setItem('auth', JSON.stringify(fallbackAuthData));
-              localStorage.setItem('user', JSON.stringify(fallbackAuthData));
             }
           } catch (e) {
             console.error('Erro ao decodificar token:', e);
@@ -147,7 +144,7 @@ export default function LoginJogadoraPage() {
             };
             
             localStorage.setItem('auth', JSON.stringify(errorAuthData));
-            localStorage.setItem('user', JSON.stringify(errorAuthData));
+
           }
         } else {
           // Se o token não tiver o formato esperado
@@ -157,13 +154,12 @@ export default function LoginJogadoraPage() {
           };
           
           localStorage.setItem('auth', JSON.stringify(simpleAuthData));
-          localStorage.setItem('user', JSON.stringify(simpleAuthData));
         }
         
         setDebugInfo('Login bem-sucedido! Redirecionando...');
         
         // Forçar o redirecionamento usando window.location
-        window.location.href = '/inicio-jogadora';
+         router.push('/inicio-jogadora');
         return; // Importante para evitar que o código continue executando
       } else {
         setError(result.message || 'Falha ao fazer login. Verifique suas credenciais.');
