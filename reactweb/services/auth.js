@@ -1,25 +1,25 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 api.interceptors.request.use(
   (config) => {
     let token = null;
-    if (typeof window !== 'undefined') {
-      const authData = localStorage.getItem('auth');
+    if (typeof window !== "undefined") {
+      const authData = localStorage.getItem("auth");
       if (authData) {
         try {
           const parsedAuth = JSON.parse(authData);
           token = parsedAuth.token;
         } catch (error) {
-          console.error('Erro ao analisar dados de autenticação:', error);
+          console.error("Erro ao analisar dados de autenticação:", error);
         }
       }
     }
@@ -47,7 +47,9 @@ api.interceptors.response.use(
           logout();
           return Promise.reject(error);
         }
-        const response = await axios.post(`${API_URL}/refresh-token`, { refreshToken });
+        const response = await axios.post(`${API_URL}/refresh-token`, {
+          refreshToken,
+        });
         const { token } = response.data;
         updateToken(token);
         originalRequest.headers.Authorization = `Bearer ${token}`;
@@ -57,24 +59,25 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-    const errorMessage = error.response?.data?.message || 'Ocorreu um erro. Tente novamente.';
+    const errorMessage =
+      error.response?.data?.message || "Ocorreu um erro. Tente novamente.";
     return Promise.reject({
       message: errorMessage,
       errors: error.response?.data?.errors || {},
-      status: error.response?.status
+      status: error.response?.status,
     });
   }
 );
 
 function getRefreshToken() {
-  if (typeof window !== 'undefined') {
-    const authData = localStorage.getItem('auth');
+  if (typeof window !== "undefined") {
+    const authData = localStorage.getItem("auth");
     if (authData) {
       try {
         const parsedAuth = JSON.parse(authData);
         return parsedAuth.refreshToken;
       } catch (error) {
-        console.error('Erro ao analisar dados de autenticação:', error);
+        console.error("Erro ao analisar dados de autenticação:", error);
       }
     }
   }
@@ -82,38 +85,38 @@ function getRefreshToken() {
 }
 
 function updateToken(token) {
-  if (typeof window !== 'undefined') {
-    const authData = localStorage.getItem('auth');
+  if (typeof window !== "undefined") {
+    const authData = localStorage.getItem("auth");
     if (authData) {
       try {
         const parsedAuth = JSON.parse(authData);
         parsedAuth.token = token;
-        localStorage.setItem('auth', JSON.stringify(parsedAuth));
+        localStorage.setItem("auth", JSON.stringify(parsedAuth));
       } catch (error) {
-        console.error('Erro ao atualizar token:', error);
+        console.error("Erro ao atualizar token:", error);
       }
     }
   }
 }
 
 function logout() {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('auth');
-    window.location.href = '/login';
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("auth");
+    window.location.href = "/login";
   }
 }
 
 export const authService = {
   async loginTorcedora(email, password) {
     try {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         return this.mockLoginTorcedora();
       }
-      const response = await api.post('/login-torcedora', { email, password });
+      const response = await api.post("/login-torcedora", { email, password });
       if (response.data.token) {
         this.setUserData({
           ...response.data,
-          role: 'torcedora'
+          role: "torcedora",
         });
       }
       return response.data;
@@ -124,14 +127,18 @@ export const authService = {
 
   async loginJogadora(email, password, rememberMe = false) {
     try {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         return this.mockLoginJogadora();
       }
-      const response = await api.post('/login-jogadora', { email, password, rememberMe });
+      const response = await api.post("/login-jogadora", {
+        email,
+        password,
+        rememberMe,
+      });
       if (response.data.token) {
         this.setUserData({
           ...response.data,
-          role: 'jogadora'
+          role: "jogadora",
         });
       }
       return response.data;
@@ -142,14 +149,14 @@ export const authService = {
 
   async registerTorcedora(firstName, lastName, email, password) {
     try {
-      if (process.env.NODE_ENV === 'development') {
-        return { success: true, message: 'Registro simulado com sucesso!' };
+      if (process.env.NODE_ENV === "development") {
+        return { success: true, message: "Registro simulado com sucesso!" };
       }
-      const response = await api.post('/register-torcedora', {
+      const response = await api.post("/register-torcedora", {
         firstName,
         lastName,
         email,
-        password
+        password,
       });
       return response.data;
     } catch (error) {
@@ -157,11 +164,21 @@ export const authService = {
     }
   },
 
-  async registerJogadora(fullName, email, password, position, team) {
+  async registerJogadora(
+    fullName,
+    email,
+    password,
+    position,
+    height = "170",
+    age = "25",
+    team
+  ) {
     try {
-      // Durante o desenvolvimento, simular registro bem-sucedido
-      if (process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_API_URL) {
-        return { success: true, message: 'Registro simulado com sucesso!' };
+      if (
+        process.env.NODE_ENV === "development" &&
+        !process.env.NEXT_PUBLIC_API_URL
+      ) {
+        return { success: true, message: "Registro simulado com sucesso!" };
       }
 
       // Preparar os dados no formato que o backend espera
@@ -169,31 +186,40 @@ export const authService = {
         username: fullName,
         email,
         password,
-        role: 'Player',
+        role: "Player",
         position,
-        height: '170',
-        age: '25',
+        height,
+        age,
       };
 
-      const response = await axios.post(`http://localhost:3001/register`, userData);
+      const response = await axios.post(`${API_URL}/register`, userData);
       console.log(response.data);
-      
-      return { success: true, message: response.data.message || 'Registro realizado com sucesso!' };
+
+      return {
+        success: true,
+        message: response.data.message || "Registro realizado com sucesso!",
+      };
     } catch (error) {
-      console.error('Erro no registro de jogadora:', error);
+      console.error("Erro no registro de jogadora:", error);
       return {
         success: false,
-        message: error.response?.data?.message || error.message || 'Erro ao registrar jogadora'
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Erro ao registrar jogadora",
       };
     }
   },
 
   async forgotPassword(email) {
     try {
-      if (process.env.NODE_ENV === 'development') {
-        return { success: true, message: 'Email de recuperação simulado enviado com sucesso!' };
+      if (process.env.NODE_ENV === "development") {
+        return {
+          success: true,
+          message: "Email de recuperação simulado enviado com sucesso!",
+        };
       }
-      const response = await api.post('/forgot-password', { email });
+      const response = await api.post("/forgot-password", { email });
       return response.data;
     } catch (error) {
       throw error;
@@ -202,11 +228,11 @@ export const authService = {
 
   mockLoginTorcedora() {
     const mockUser = {
-      id: '1',
-      name: 'Maria Silva',
-      email: 'maria@example.com',
-      role: 'torcedora',
-      token: 'mock-token-torcedora-123456',
+      id: "1",
+      name: "Maria Silva",
+      email: "maria@example.com",
+      role: "torcedora",
+      token: "mock-token-torcedora-123456",
     };
     this.setUserData(mockUser);
     return mockUser;
@@ -214,42 +240,42 @@ export const authService = {
 
   mockLoginJogadora() {
     const mockUser = {
-      id: '2',
-      name: 'Ana Santos',
-      email: 'ana@example.com',
-      role: 'jogadora',
-      position: 'Atacante',
-      team: 'Corinthians',
-      token: 'mock-token-jogadora-123456',
+      id: "2",
+      name: "Ana Santos",
+      email: "ana@example.com",
+      role: "jogadora",
+      position: "Atacante",
+      team: "Corinthians",
+      token: "mock-token-jogadora-123456",
     };
     this.setUserData(mockUser);
     return mockUser;
   },
 
   simulateLogin(role) {
-    if (role === 'torcedora') {
+    if (role === "torcedora") {
       return this.mockLoginTorcedora();
-    } else if (role === 'jogadora') {
+    } else if (role === "jogadora") {
       return this.mockLoginJogadora();
     }
     return null;
   },
 
   setUserData(userData) {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('auth', JSON.stringify(userData));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("auth", JSON.stringify(userData));
     }
   },
 
   logout() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth');
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("auth");
     }
   },
 
   getCurrentUser() {
-    if (typeof window !== 'undefined') {
-      return JSON.parse(localStorage.getItem('auth'));
+    if (typeof window !== "undefined") {
+      return JSON.parse(localStorage.getItem("auth"));
     }
     return null;
   },
@@ -265,13 +291,13 @@ export const authService = {
 
   getRedirectPath() {
     const role = this.getUserRole();
-    if (role === 'torcedora') {
-      return '/inicio';
-    } else if (role === 'jogadora') {
-      return '/inicio-jogadora';
+    if (role === "torcedora") {
+      return "/inicio";
+    } else if (role === "jogadora") {
+      return "/inicio-jogadora";
     }
-    return '/login';
-  }
+    return "/login";
+  },
 };
 
 export default authService;

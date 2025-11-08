@@ -1,10 +1,11 @@
+// reactweb/app/(main)/competicoes/page.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import BrazilMap from '@/components/competitions/BrazilMap';
 import FilterPanel from '@/components/competitions/FilterPanel';
 import CompetitionsList from '@/components/competitions/CompetitionsList';
-import ApplicationModal from '@/components/competitions/ApplicationModal';
+import TeamSelectionModal from '@/components/competitions/TeamSelectionModal';
 import { Toast } from '@/components/ui';
 import { competitionsService } from '@/services/mocks/competitionsData';
 
@@ -23,7 +24,7 @@ export default function CompetitionsPage() {
   
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCompetition, setSelectedCompetition] = useState(null);
-  const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [showTeamSelectionModal, setShowTeamSelectionModal] = useState(false);
   const [toast, setToast] = useState(null);
   
   useEffect(() => {
@@ -108,7 +109,7 @@ export default function CompetitionsPage() {
   const handleApply = (competitionId) => {
     const competition = competitions.find(comp => comp.id === competitionId);
     if (competition && competition.status === 'Inscrições abertas') {
-      setShowApplicationModal(true);
+      setShowTeamSelectionModal(true);
     } else {
       setToast({
         message: 'As inscrições para esta competição não estão abertas',
@@ -117,22 +118,14 @@ export default function CompetitionsPage() {
     }
   };
   
-  const handleSubmitApplication = (formData) => {
+  const handleTeamSelection = (data) => {
     // Em um ambiente real, isso enviaria os dados para a API
-    const result = competitionsService.applyForCompetition(selectedCompetition.id, formData);
+    setShowTeamSelectionModal(false);
     
-    if (result.success) {
-      setShowApplicationModal(false);
-      setToast({
-        message: result.message,
-        type: 'success'
-      });
-    } else {
-      setToast({
-        message: result.message,
-        type: 'error'
-      });
-    }
+    setToast({
+      message: `Inscrição realizada com sucesso para o time ${data.teamId}!`,
+      type: 'success'
+    });
   };
 
   if (isLoading) {
@@ -193,12 +186,12 @@ export default function CompetitionsPage() {
         />
       </div>
       
-      {/* Modal de inscrição */}
-      {showApplicationModal && selectedCompetition && (
-        <ApplicationModal 
+      {/* Modal de seleção de time */}
+      {showTeamSelectionModal && selectedCompetition && (
+        <TeamSelectionModal 
           competition={selectedCompetition}
-          onClose={() => setShowApplicationModal(false)}
-          onSubmit={handleSubmitApplication}
+          onClose={() => setShowTeamSelectionModal(false)}
+          onSubmit={handleTeamSelection}
         />
       )}
       

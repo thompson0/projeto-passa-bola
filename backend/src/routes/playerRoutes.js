@@ -6,8 +6,9 @@ import { isPlayer } from '../middlewares/checkRoleMiddleware.js';
 const router = express.Router()
 
 // Rotas para adicionar jogadoras a um time, e para deletar jogadoras de um time
+router.get('/players', authMiddleware, PlayersController.getAllPlayers);
 router.get('/teams/:teamId/players', authMiddleware, PlayersController.getPlayers)
+router.post('/teams/:teamId/join', authMiddleware, isPlayer, PlayersController.joinTeam);
 router.post('/teams/:teamId/players', authMiddleware, isPlayer, PlayersController.addPlayer)
 router.delete('/teams/:teamId/players/:playerId', authMiddleware, isPlayer, PlayersController.removePlayer)
-
 export default router;

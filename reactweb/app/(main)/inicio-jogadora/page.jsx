@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
 import HeroSection from '@/components/jogadora/HeroSection';
 import MatchesSection from '@/components/jogadora/MatchesSection';
 import CommunitySection from '@/components/jogadora/CommunitySection';
@@ -12,20 +11,18 @@ import { playerFeedService } from '@/services/mocks/playerData';
 
 export default function InicioJogadoraPage() {
   const router = useRouter();
-  const { user, role, isAuthenticated, isLoading } = useAuth();
   const [feedData, setFeedData] = useState(null);
   const [isLoadingFeed, setIsLoadingFeed] = useState(true);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    // Verificar se o usuário está autenticado
+    const auth = localStorage.getItem('auth');
+    if (!auth) {
       router.push('/login-jogadora');
-    } else if (!isLoading && role !== 'jogadora') {
-      router.push('/login');
+      return;
     }
-  }, [isAuthenticated, isLoading, role, router]);
 
-  useEffect(() => {
     const fetchFeedData = async () => {
       try {
         // Em um ambiente real, isso seria uma chamada de API
@@ -39,7 +36,7 @@ export default function InicioJogadoraPage() {
     };
 
     fetchFeedData();
-  }, []);
+  }, [router]);
 
   const handleConfirmMatch = (matchId) => {
     try {
@@ -80,7 +77,7 @@ export default function InicioJogadoraPage() {
     }
   };
 
-  if (isLoading || !isAuthenticated || role !== 'jogadora' || isLoadingFeed) {
+  if (isLoadingFeed) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">

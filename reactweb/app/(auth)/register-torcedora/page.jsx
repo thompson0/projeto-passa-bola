@@ -1,3 +1,4 @@
+// reactweb/app/(auth)/register-torcedora/page.jsx
 'use client';
 
 import React, { useState } from 'react';
@@ -5,13 +6,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { Button, FormInput, Checkbox } from '@/components/ui';
-import authService from '@/services/auth';
 
 export default function RegisterTorcedoraPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [debugInfo, setDebugInfo] = useState('');
   
   const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm({
     defaultValues: {
@@ -31,22 +31,44 @@ export default function RegisterTorcedoraPage() {
     try {
       setIsLoading(true);
       setError('');
-      setSuccess('');
+      setDebugInfo('Iniciando registro de torcedora...');
       
-      await authService.registerTorcedora(
-        data.firstName,
-        data.lastName,
-        data.email,
-        data.password
-      );
-      
-      setSuccess('Cadastro realizado com sucesso! Redirecionando para o login...');
-      
-      setTimeout(() => {
-        router.push('/login-torcedora');
-      }, 2000);
+      // Preparar os dados no formato que o backend espera
+      const userData = {
+        username: `${data.firstName} ${data.lastName}`, // Combinando nome e sobrenome para username
+        email: data.email,
+        password: data.password,
+        // Não incluir role para que seja registrado como usuário padrão (torcedora)
+      };
+
+      setDebugInfo(`Dados preparados: ${JSON.stringify(userData)}`);
+      console.log('Dados enviados para registro:', userData);
+
+      // Fazer a requisição para o backend
+      const response = await fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const result = await response.json();
+      console.log('Resposta do servidor:', result);
+      setDebugInfo(`Resposta: ${JSON.stringify(result)}`);
+
+      if (response.ok) {
+        setDebugInfo('Registro bem-sucedido! Redirecionando...');
+        setTimeout(() => {
+          router.push('/login-torcedora?registered=true');
+        }, 2000);
+      } else {
+        setError(result.message || 'Erro ao criar conta. Tente novamente.');
+      }
     } catch (error) {
-      setError(error.message || 'Falha ao registrar. Tente novamente.');
+      console.error('Erro no registro:', error);
+      setDebugInfo(`Erro: ${error.message}`);
+      setError(error.message || 'Erro ao criar conta. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -65,9 +87,9 @@ export default function RegisterTorcedoraPage() {
         </div>
       )}
       
-      {success && (
-        <div className="bg-green-500 bg-opacity-10 border border-green-500 text-green-500 px-4 py-3 rounded-md">
-          {success}
+      {debugInfo && (
+        <div className="bg-blue-500 bg-opacity-10 border border-blue-500 text-blue-500 px-4 py-3 rounded-md text-xs">
+          <pre>{debugInfo}</pre>
         </div>
       )}
       

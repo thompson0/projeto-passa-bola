@@ -1,4 +1,4 @@
-// middleware.js
+// reactweb/middleware.js
 import { NextResponse } from 'next/server';
 
 export function middleware(request) {
@@ -23,16 +23,16 @@ export function middleware(request) {
   
   // Se o usuário estiver autenticado e tentando acessar uma rota pública
   if (isPublicPath && token) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    return NextResponse.redirect(new URL('/inicio-jogadora', request.url));
   }
   
   return NextResponse.next();
 }
 
-// Configuração para quais rotas o middleware deve ser executado
 export const config = {
   matcher: [
-    '/dashboard/:path*',
+    '/inicio-jogadora',
+    '/inicio',
     '/login',
     '/register',
     '/login-torcedora',

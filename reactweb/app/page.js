@@ -18,8 +18,8 @@ export default function Home() {
           router.push('/inicio-jogadora');
         }
       } else {
-        // Em produção, descomentar esta linha:
-        // router.push('/login');
+        // Redirecionar para a página de login
+        router.push('/login');
       }
     }
   }, [isAuthenticated, role, isLoading, router]);
@@ -37,19 +37,8 @@ export default function Home() {
             href="/login" 
             className="block w-full bg-primary hover:bg-primary-dark text-white py-3 px-4 rounded-md text-center transition-colors"
           >
-            Login Normal
+            Acessar Plataforma
           </Link>
-          
-          <Link 
-            href="/dev-login" 
-            className="block w-full bg-lilac hover:bg-lilac-dark text-primary py-3 px-4 rounded-md text-center transition-colors"
-          >
-            Modo de Desenvolvimento
-          </Link>
-          
-          <p className="text-sm text-text-secondary mt-4">
-            Use o modo de desenvolvimento para visualizar as interfaces sem precisar de uma API.
-          </p>
         </div>
       </div>
     </div>

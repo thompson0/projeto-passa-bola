@@ -1,3 +1,4 @@
+// reactweb/app/(main)/competicoes-global/page.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -7,6 +8,8 @@ import FilterBar from '@/components/global-competitions/FilterBar';
 import CompetitionCard from '@/components/global-competitions/CompetitionCard';
 import { Toast } from '@/components/ui';
 import { globalCompetitionsService } from '@/services/mocks/globalCompetitionsData';
+import TeamSelectionModal from '../../../components/competitions/TeamSelectionModal';
+
 
 export default function GlobalCompetitionsPage() {
   const router = useRouter();
@@ -16,15 +19,19 @@ export default function GlobalCompetitionsPage() {
   const [competitions, setCompetitions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState(null);
-  
+
+  // Adicionar estes estados
+  const [selectedCompetition, setSelectedCompetition] = useState(null);
+  const [showTeamSelectionModal, setShowTeamSelectionModal] = useState(false);
+
   const [filters, setFilters] = useState({
     continent: 'todos',
     year: 'todos',
     category: 'todos'
   });
-  
+
   const [selectedContinent, setSelectedContinent] = useState(null);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -33,7 +40,7 @@ export default function GlobalCompetitionsPage() {
         const yearsData = globalCompetitionsService.getYears();
         const categoriesData = globalCompetitionsService.getCategories();
         const competitionsData = globalCompetitionsService.getCompetitions();
-        
+
         setContinents(continentsData);
         setYears(yearsData);
         setCategories(categoriesData);
@@ -47,7 +54,7 @@ export default function GlobalCompetitionsPage() {
 
     fetchData();
   }, []);
-  
+
   useEffect(() => {
     // Atualizar competições quando os filtros mudarem
     const fetchFilteredCompetitions = async () => {
@@ -62,18 +69,18 @@ export default function GlobalCompetitionsPage() {
 
     fetchFilteredCompetitions();
   }, [filters]);
-  
+
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({
       ...prev,
       [filterName]: value
     }));
-    
+
     if (filterName === 'continent') {
       setSelectedContinent(value === 'todos' ? null : value);
     }
   };
-  
+
   const handleSelectContinent = (continentId) => {
     setSelectedContinent(continentId);
     setFilters(prev => ({
@@ -81,13 +88,14 @@ export default function GlobalCompetitionsPage() {
       continent: continentId
     }));
   };
-  
+
   const handleApply = (competitionId) => {
     const competition = competitions.find(comp => comp.id === competitionId);
-    
+
     if (competition && competition.registrationOpen) {
-      // Redirecionar para a página de inscrição
-      router.push(`/inscricao?competitionId=${competitionId}`);
+      // Mostrar o modal de seleção de time em vez de redirecionar
+      setSelectedCompetition(competition);
+      setShowTeamSelectionModal(true);
     } else {
       setToast({
         message: 'As inscrições para esta competição não estão abertas',
@@ -95,6 +103,21 @@ export default function GlobalCompetitionsPage() {
       });
     }
   };
+
+  // Adicionar a função handleTeamSelection
+  const handleTeamSelection = (data) => {
+    setShowTeamSelectionModal(false);
+
+    const message = data.isOwner
+      ? `Você está inscrito na competição com seu time "${data.teamName}"!`
+      : `Você ingressou no time "${data.teamName}" e está inscrito na competição!`;
+
+    setToast({
+      message,
+      type: 'success'
+    });
+  };
+
 
   if (isLoading) {
     return (
@@ -115,31 +138,31 @@ export default function GlobalCompetitionsPage() {
           Explore as competições de futebol feminino ao redor do mundo e inscreva sua equipe.
         </p>
       </div>
-      
+
       {/* Mapa Mundi */}
       <div className="bg-background-light rounded-lg p-6 mb-8">
         <div className="aspect-w-2 aspect-h-1 w-full">
-          <WorldMap 
+          <WorldMap
             continents={continents}
             selectedContinent={selectedContinent}
             onSelectContinent={handleSelectContinent}
           />
         </div>
       </div>
-      
+
       {/* Barra de filtros */}
-      <FilterBar 
+      <FilterBar
         continents={continents}
         years={years}
         categories={categories}
         filters={filters}
         onFilterChange={handleFilterChange}
       />
-      
+
       {/* Lista de competições */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-white mb-6">Competições disponíveis</h2>
-        
+
         {competitions.length === 0 ? (
           <div className="bg-background-light rounded-lg p-8 text-center">
             <p className="text-gray-300">Nenhuma competição encontrada com os filtros selecionados.</p>
@@ -147,8 +170,8 @@ export default function GlobalCompetitionsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {competitions.map((competition) => (
-              <CompetitionCard 
-                key={competition.id} 
+              <CompetitionCard
+                key={competition.id}
                 competition={competition}
                 onApply={handleApply}
               />
@@ -156,13 +179,22 @@ export default function GlobalCompetitionsPage() {
           </div>
         )}
       </div>
-      
+
+      {/* Modal de seleção de time */}
+      {showTeamSelectionModal && selectedCompetition && (
+        <TeamSelectionModal
+          competition={selectedCompetition}
+          onClose={() => setShowTeamSelectionModal(false)}
+          onSubmit={handleTeamSelection}
+        />
+      )}
+
       {/* Toast de notificação */}
       {toast && (
-        <Toast 
-          message={toast.message} 
-          type={toast.type} 
-          onClose={() => setToast(null)} 
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </div>

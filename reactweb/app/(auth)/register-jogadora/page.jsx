@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -11,6 +10,7 @@ export default function RegisterJogadoraPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [debugInfo, setDebugInfo] = useState('');
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
@@ -19,7 +19,9 @@ export default function RegisterJogadoraPage() {
       password: '',
       confirmPassword: '',
       position: '',
-      team: ''
+      team: '',
+      height: '170',
+      age: '25'
     },
     mode: 'onTouched'
   });
@@ -33,25 +35,24 @@ export default function RegisterJogadoraPage() {
     try {
       setIsLoading(true);
       setError('');
-
-      // Alerta para verificar se esta parte do código está sendo executada
-      alert('Enviando dados para registro...');
+      setDebugInfo('Iniciando registro...');
 
       // Preparar os dados no formato que o backend espera
       const userData = {
-        username: data.fullName,  // Mapeando fullName para username
+        username: data.fullName,
         email: data.email,
         password: data.password,
-        role: 'Player',           // Definindo role como Player
+        role: 'Player',
         position: data.position,
-        height: '170',            // Valor padrão para altura
-        age: '25',                // Valor padrão para idade
+        height: data.height,
+        age: data.age
       };
 
+      setDebugInfo(`Dados preparados: ${JSON.stringify(userData)}`);
       console.log('Dados enviados para registro:', userData);
 
-      // Usar fetch diretamente na página
-      const response = await fetch('http://localhost:3001/register', {
+      // Fazer a requisição para o backend
+      const response = await fetch('http://localhost:3000/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,23 +62,22 @@ export default function RegisterJogadoraPage() {
 
       const result = await response.json();
       console.log('Resposta do servidor:', result);
+      setDebugInfo(`Resposta: ${JSON.stringify(result)}`);
 
       if (response.ok) {
-        alert('Registro realizado com sucesso!');
         router.push('/login-jogadora?registered=true');
       } else {
         setError(result.message || 'Erro ao criar conta. Tente novamente.');
       }
     } catch (error) {
       console.error('Erro no registro:', error);
-      alert('Erro: ' + error.message);
+      setDebugInfo(`Erro: ${error.message}`);
       setError(error.message || 'Erro ao criar conta. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Opções para o campo de posição
   const positionOptions = [
     { value: '', label: 'Selecione uma posição' },
     { value: 'goleira', label: 'Goleira' },
@@ -98,6 +98,12 @@ export default function RegisterJogadoraPage() {
       {error && (
         <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded-md">
           {error}
+        </div>
+      )}
+
+      {debugInfo && (
+        <div className="bg-blue-500 bg-opacity-10 border border-blue-500 text-blue-500 px-4 py-3 rounded-md text-xs">
+          <pre>{debugInfo}</pre>
         </div>
       )}
 
@@ -166,7 +172,7 @@ export default function RegisterJogadoraPage() {
             </label>
             <select
               id="position"
-              className={`w-full bg-background border ${errors.position ? 'border-red-500' : 'border-gray-700'} rounded-lg p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary`}
+              className="w-full bg-background border border-gray-700 rounded-md p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary"
               {...register('position', {
                 required: 'Posição é obrigatória'
               })}
@@ -190,6 +196,46 @@ export default function RegisterJogadoraPage() {
               required: 'Time é obrigatório'
             })}
             error={errors.team?.message}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormInput
+            id="height"
+            label="Altura (cm)"
+            type="number"
+            placeholder="170"
+            {...register('height', {
+              required: 'Altura é obrigatória',
+              min: {
+                value: 100,
+                message: 'Altura mínima de 100cm'
+              },
+              max: {
+                value: 220,
+                message: 'Altura máxima de 220cm'
+              }
+            })}
+            error={errors.height?.message}
+          />
+
+          <FormInput
+            id="age"
+            label="Idade"
+            type="number"
+            placeholder="25"
+            {...register('age', {
+              required: 'Idade é obrigatória',
+              min: {
+                value: 16,
+                message: 'Idade mínima de 16 anos'
+              },
+              max: {
+                value: 60,
+                message: 'Idade máxima de 60 anos'
+              }
+            })}
+            error={errors.age?.message}
           />
         </div>
 

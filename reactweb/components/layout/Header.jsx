@@ -1,3 +1,4 @@
+// reactweb/components/layout/Header.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -5,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import RoleToggle from '@/components/auth/RoleToggle';
 
 const Header = () => {
   const { user, role, isAuthenticated, logout } = useAuth();
@@ -14,92 +14,111 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
-  
+
   const isShopPage = pathname?.includes('/loja');
-  
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isProfileDropdownOpen && !event.target.closest('.profile-dropdown')) {
         setIsProfileDropdownOpen(false);
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isProfileDropdownOpen]);
-  
-  const navigationLinks = role === 'jogadora' 
-    ? [
-        { name: 'Home', href: '/inicio-jogadora' },
-        { name: 'Competições', href: '/competicoes-mapa' },
-        { name: 'Comunidade', href: '/comunidade' },
-        { name: 'Uploads', href: '/uploads' },
-        { name: 'Loja', href: '/loja' },
-        { name: 'Partidas', href: '/partidas' },
-        { name: 'Ranking', href: '/ranking' },
-      ]
-    : [
-        { name: 'Início', href: '/inicio' },
-        { name: 'Competições', href: '/competicoes' },
-        { name: 'Loja', href: '/loja' },
-        { name: 'Comunidade', href: '/comunidade' },
-        { name: 'Votação', href: '/votacao' },
-      ];
-  
+
+  // Obter a inicial do nome do usuário
+  const getUserInitial = () => {
+    // Tentar obter o nome do usuário de diferentes fontes possíveis
+    const username = user?.username || user?.name || user?.user?.username || '';
+
+    // Verificar se temos um nome de usuário
+    if (username) {
+      console.log('Nome do usuário:', username); // Log para depuração
+      return username.charAt(0).toUpperCase();
+    }
+
+    // Tentar obter o email como fallback
+    const email = user?.email || user?.user?.email || '';
+    if (email) {
+      return email.charAt(0).toUpperCase();
+    }
+
+    return 'A'; // Fallback padrão
+  };
+
+  const navigationLinks = role === 'jogadora'
+  ? [
+    { name: 'Home', href: '/inicio-jogadora' },
+    { name: 'Competições', href: '/competicoes-global' }, // Corrigido de '/competicoes-mapa' para '/competicoes-global'
+    { name: 'Comunidade', href: '/comunidade' },
+    { name: 'Uploads', href: '/uploads' },
+    { name: 'Loja', href: '/loja' },
+    { name: 'Partidas', href: '/partidas' },
+    { name: 'Ranking', href: '/ranking' },
+  ]
+  : [
+    { name: 'Início', href: '/inicio' },
+    { name: 'Competições', href: '/competicoes' },
+    { name: 'Loja', href: '/loja' },
+    { name: 'Comunidade', href: '/comunidade' },
+    { name: 'Votação', href: '/votacao' },
+  ];
+
   const profileMenuItems = role === 'jogadora'
     ? [
-        { name: 'Meu Perfil', href: '/perfil' },
-        { name: 'Minha Equipe', href: '/minha-equipe' },
-        { name: 'Meus Jogos', href: '/meus-jogos' },
-        { name: 'Configurações', href: '/configuracoes' },
-      ]
+      { name: 'Meu Perfil', href: '/perfil' },
+      { name: 'Minha Equipe', href: '/minha-equipe' },
+      { name: 'Meus Jogos', href: '/meus-jogos' },
+      { name: 'Configurações', href: '/configuracoes' },
+    ]
     : [
-        { name: 'Meu Perfil', href: '/perfil' },
-        { name: 'Inscrever-se', href: '/inscrever-se' },
-        { name: 'Configurações', href: '/configuracoes' },
-      ];
-  
+      { name: 'Meu Perfil', href: '/perfil' },
+      { name: 'Inscrever-se', href: '/inscrever-se' },
+      { name: 'Configurações', href: '/configuracoes' },
+    ];
+
   return (
-    <header 
-      className={`sticky top-0 z-50 bg-background h-[72px] ${
-        isScrolled ? 'shadow-md' : 'shadow-sm'
-      } transition-shadow duration-300`}
+    <header
+      className={`sticky top-0 z-50 bg-background h-[72px] ${isScrolled ? 'shadow-md' : 'shadow-sm'
+        } transition-shadow duration-300`}
     >
       <div className="container max-w-[1280px] mx-auto px-6 h-full flex items-center justify-between">
         <div className="flex items-center">
           <Link href={role === 'jogadora' ? '/inicio-jogadora' : '/inicio'} className="flex items-center">
-            <Image 
-              src="/assets/images/logo.svg" 
-              alt="Passa Bola" 
-              width={40} 
+            <Image
+              src="/assets/images/logo.svg"
+              alt="Passa Bola"
+              width={40}
               height={40}
               className="h-10 w-auto"
             />
             <span className="ml-2 text-white font-bold text-xl hidden sm:block">Passa Bola</span>
           </Link>
         </div>
-        
+
         <nav className="hidden md:flex items-center space-x-1">
           {navigationLinks.map((link) => {
-            const isActive = pathname === link.href || 
-                            (link.href !== '/' && pathname?.startsWith(link.href));
-            
+            const isActive = pathname === link.href ||
+              (link.href !== '/' && pathname?.startsWith(link.href));
+
             return (
               <Link
                 key={link.name}
                 href={link.href}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative
-                  ${isActive 
-                    ? 'text-lilac' 
+                  ${isActive
+                    ? 'text-lilac'
                     : 'text-white hover:text-lilac-light'
                   }`}
               >
@@ -111,10 +130,9 @@ const Header = () => {
             );
           })}
         </nav>
-        
+
         <div className="flex items-center gap-4">
-          <RoleToggle />
-          <button 
+          <button
             className="text-white hover:text-lilac-light transition-colors focus:outline-none focus:ring-2 focus:ring-lilac focus:ring-offset-2 focus:ring-offset-background rounded-full p-1"
             aria-label="Buscar"
           >
@@ -122,9 +140,9 @@ const Header = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
-          
+
           {isAuthenticated && (
-            <button 
+            <button
               className="text-white hover:text-lilac-light transition-colors focus:outline-none focus:ring-2 focus:ring-lilac focus:ring-offset-2 focus:ring-offset-background rounded-full p-1"
               aria-label="Notificações"
             >
@@ -133,9 +151,9 @@ const Header = () => {
               </svg>
             </button>
           )}
-          
+
           {isShopPage && (
-            <Link 
+            <Link
               href="/loja/carrinho"
               className="text-white hover:text-lilac-light transition-colors focus:outline-none focus:ring-2 focus:ring-lilac focus:ring-offset-2 focus:ring-offset-background rounded-full p-1 relative"
               aria-label="Carrinho"
@@ -150,10 +168,10 @@ const Header = () => {
               )}
             </Link>
           )}
-          
+
           {isAuthenticated ? (
             <div className="relative profile-dropdown">
-              <button 
+              <button
                 className="flex items-center focus:outline-none focus:ring-2 focus:ring-lilac focus:ring-offset-2 focus:ring-offset-background rounded-full"
                 onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                 aria-expanded={isProfileDropdownOpen}
@@ -161,19 +179,19 @@ const Header = () => {
               >
                 <div className="h-8 w-8 rounded-full bg-lilac flex items-center justify-center text-primary font-medium overflow-hidden">
                   {user?.profileImage ? (
-                    <Image 
-                      src={user.profileImage} 
-                      alt={user.name || 'Avatar'} 
-                      width={32} 
+                    <Image
+                      src={user.profileImage}
+                      alt={user.name || 'Avatar'}
+                      width={32}
                       height={32}
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <span>{(user?.name || 'U')[0].toUpperCase()}</span>
+                    <span>{getUserInitial()}</span>
                   )}
                 </div>
               </button>
-              
+
               {isProfileDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 ring-1 ring-black ring-opacity-5">
                   {profileMenuItems.map((item) => (
@@ -206,7 +224,7 @@ const Header = () => {
               Entrar
             </Link>
           )}
-          
+
           <button
             className="md:hidden text-white hover:text-lilac-light transition-colors focus:outline-none focus:ring-2 focus:ring-lilac focus:ring-offset-2 focus:ring-offset-background rounded-md"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -224,23 +242,22 @@ const Header = () => {
           </button>
         </div>
       </div>
-      
+
       {isMobileMenuOpen && (
         <div id="mobile-menu" className="md:hidden bg-background-dark">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navigationLinks.map((link) => {
-              const isActive = pathname === link.href || 
-                              (link.href !== '/' && pathname?.startsWith(link.href));
-              
+              const isActive = pathname === link.href ||
+                (link.href !== '/' && pathname?.startsWith(link.href));
+
               return (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${
-                    isActive 
-                      ? 'bg-lilac/10 text-lilac' 
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${isActive
+                      ? 'bg-lilac/10 text-lilac'
                       : 'text-white hover:bg-lilac/5 hover:text-lilac-light'
-                  }`}
+                    }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.name}
