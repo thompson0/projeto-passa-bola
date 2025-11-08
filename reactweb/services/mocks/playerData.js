@@ -197,3 +197,6 @@ export const playerFeedService = {
     return { success: false, message: 'Não foi possível confirmar presença.' };
   }
 };
+
+// Export playerService alias for compatibility
+export const playerService = playerFeedService;

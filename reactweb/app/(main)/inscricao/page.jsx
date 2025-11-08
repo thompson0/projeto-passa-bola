@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import RegistrationForm from '@/components/registration/RegistrationForm';
@@ -8,7 +8,7 @@ import SuccessMessage from '@/components/registration/SuccessMessage';
 import { Button } from '@/components/ui';
 import { globalCompetitionsService } from '@/services/mocks/globalCompetitionsData';
 
-export default function RegistrationPage() {
+function RegistrationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const competitionId = searchParams.get('competitionId');
@@ -128,5 +128,20 @@ export default function RegistrationPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function RegistrationPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent mx-auto"></div>
+          <p className="mt-4 text-accent">Carregando...</p>
+        </div>
+      </div>
+    }>
+      <RegistrationContent />
+    </Suspense>
   );
 }

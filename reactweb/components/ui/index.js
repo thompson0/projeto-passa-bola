@@ -1,5 +1,5 @@
 import Button from './Button';
-import Card from './Card';
+import Card, { CardHeader, CardTitle, CardContent, CardFooter } from './Card';
 import Checkbox from './Checkbox';
 import FormInput from './FormInput';
 import Input from './Input';
@@ -12,6 +12,10 @@ import Autocomplete from './Autocomplete';
 export {
   Button,
   Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
   Checkbox,
   FormInput,
   Input,
