@@ -18,6 +18,7 @@ Uma plataforma web completa para o futebol feminino, conectando jogadoras e torc
 - API do backend rodando (veja instruções abaixo)
 
 ## Instalação
+Rodar primeiro o servidor
 
 1. Clone o repositório:
    ```bash
@@ -31,13 +32,13 @@ Configure as variáveis de ambiente: Crie um arquivo .env.local na raiz do proje
 Executando o projeto
 Desenvolvimento
 npm run dev
-O site estará disponível em http://localhost:3000.
+O site estará disponível em http://localhost:3001.
 
 Produção
 npm run build
 npm start
 Conexão com a API
-Este projeto requer uma API backend para funcionar corretamente. Por padrão, ele tentará se conectar a http://localhost:3001/api.
+Este projeto requer uma API backend para funcionar corretamente. Por padrão, ele tentará se conectar a http://localhost:3000/api.
 
 Configurando a API
 Clone o repositório da API:
