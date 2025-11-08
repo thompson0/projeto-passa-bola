@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { API_URL } from '@/services/apiConfig';
 
 // Criação do contexto
 const AuthContext = createContext({
@@ -15,8 +16,6 @@ const AuthContext = createContext({
   toggleRole: () => {},
 });
 
-// URL base da API
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 // Provider do contexto
 export const AuthProvider = ({ children }) => {

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { Button, FormInput, Checkbox } from '@/components/ui';
+import { API_URL } from '@/services/apiConfig';
 
 export default function RegisterTorcedoraPage() {
   const router = useRouter();
@@ -45,7 +46,7 @@ export default function RegisterTorcedoraPage() {
       console.log('Dados enviados para registro:', userData);
 
       // Fazer a requisição para o backend
-      const response = await fetch('http://localhost:3000/register', {
+      const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { Button, FormInput } from '@/components/ui';
+import { API_URL } from '@/services/apiConfig';
 
 export default function LoginTorcedoraPage() {
   const router = useRouter();
@@ -37,7 +38,7 @@ export default function LoginTorcedoraPage() {
       setDebugInfo(`Dados preparados: ${JSON.stringify(loginData)}`);
 
       // Fazer a requisição para o backend
-      const response = await fetch('http://localhost:3000/login', {
+      const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

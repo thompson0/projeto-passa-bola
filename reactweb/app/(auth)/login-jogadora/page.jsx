@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { Button, FormInput, Checkbox } from '@/components/ui';
+import { API_URL } from '@/services/apiConfig';
 
 export default function LoginJogadoraPage() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export default function LoginJogadoraPage() {
       setDebugInfo(`Dados preparados: ${JSON.stringify(loginData)}`);
 
       // Fazer a requisição para o backend
-      const response = await fetch('http://localhost:3000/login', {
+      const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +73,7 @@ export default function LoginJogadoraPage() {
             
             // Agora vamos buscar os dados do usuário
             try {
-              const userResponse = await fetch(`http://localhost:3000/users/${payload.id}`, {
+              const userResponse = await fetch(`${API_URL}/users/${payload.id}`, {
                 headers: {
                   'Authorization': `Bearer ${result.token}`
                 }

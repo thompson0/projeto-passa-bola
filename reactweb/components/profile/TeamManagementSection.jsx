@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Toast } from '@/components/ui';
+import { API_URL } from '@/services/apiConfig';
 
 const TeamManagementSection = ({ userId }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -40,7 +41,7 @@ const TeamManagementSection = ({ userId }) => {
         }
 
         // Buscar todos os times
-        const response = await fetch('http://localhost:3000/teams', {
+        const response = await fetch(`${API_URL}/teams`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -124,7 +125,7 @@ const TeamManagementSection = ({ userId }) => {
       }
 
       // Atualizar nome do time
-      const response = await fetch(`http://localhost:3000/teams/${team._id}`, {
+      const response = await fetch(`${API_URL}/teams/${team._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -181,7 +182,7 @@ const TeamManagementSection = ({ userId }) => {
       }
 
       // Remover jogadora do time
-      const response = await fetch(`http://localhost:3000/teams/${team._id}/players/${playerToRemove._id}`, {
+      const response = await fetch(`${API_URL}/teams/${team._id}/players/${playerToRemove._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -238,7 +239,7 @@ const TeamManagementSection = ({ userId }) => {
       }
 
       // Remover o próprio usuário do time
-      const response = await fetch(`http://localhost:3000/teams/${team._id}/players/${userId}`, {
+      const response = await fetch(`${API_URL}/teams/${team._id}/players/${userId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -290,7 +291,7 @@ const TeamManagementSection = ({ userId }) => {
       }
 
       // Deletar time
-      const response = await fetch(`http://localhost:3000/teams/${team._id}`, {
+      const response = await fetch(`${API_URL}/teams/${team._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

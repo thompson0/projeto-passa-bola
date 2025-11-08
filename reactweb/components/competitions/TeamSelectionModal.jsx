@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui';
+import { API_URL } from '@/services/apiConfig';
 
 const TeamSelectionModal = ({ competition, onClose, onSubmit }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +42,7 @@ const TeamSelectionModal = ({ competition, onClose, onSubmit }) => {
         
         console.log('Token para buscar times:', token);
         
-        const response = await fetch('http://localhost:3000/teams', {
+        const response = await fetch(`${API_URL}/teams`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -120,7 +121,7 @@ const TeamSelectionModal = ({ competition, onClose, onSubmit }) => {
       console.log('Token para criar time:', token);
       console.log('Dados do time:', newTeam);
       
-      const response = await fetch('http://localhost:3000/teams', {
+      const response = await fetch(`${API_URL}/teams`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -241,7 +242,7 @@ const TeamSelectionModal = ({ competition, onClose, onSubmit }) => {
       console.log('Ingressando no time:', selectedTeam);
       console.log('Token:', token);
       
-      const response = await fetch(`http://localhost:3000/teams/${selectedTeam}/join`, {
+      const response = await fetch(`${API_URL}/teams/${selectedTeam}/join`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
